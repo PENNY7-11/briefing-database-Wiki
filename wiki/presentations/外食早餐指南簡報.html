@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>台灣外食族早餐營養學與熱量控制指南 - 簡報</title>
+  <style>
+    :root {
+      --primary: #10b981;
+      --primary-dark: #059669;
+      --primary-light: #d1fae5;
+      --accent: #f59e0b;
+      --danger: #ef4444;
+      --text: #1f2937;
+      --text-muted: #6b7280;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --border: #e2e8f0;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* Top Progress Bar */
+    #progress-container {
+      width: 100%;
+      height: 6px;
+      background: #e2e8f0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 100;
+    }
+    #progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #10b981, #06b6d4, #f59e0b);
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Main Slide Deck Canvas */
+    #deck-container {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px 80px 20px;
+    }
+
+    .slide {
+      position: absolute;
+      width: 90%;
+      max-width: 1100px;
+      height: 85%;
+      max-height: 700px;
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      padding: 40px 48px;
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow-y: auto;
+      animation: fadeIn 0.35s ease-out forwards;
+    }
+
+    .slide.active {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.99);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* Slide Header */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #f1f5f9;
+      padding-bottom: 16px;
+      margin-bottom: 20px;
+    }
+
+    .slide-tag {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .slide-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
+
+    .source-badge {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      background: #f1f5f9;
+      padding: 4px 10px;
+      border-radius: 6px;
+    }
+
+    /* Content Layouts */
+    .slide-body {
+      flex: 1;
+      display: grid;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .grid-2 {
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+
+    .grid-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .grid-1-1-1 {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+
+    /* Cards & Badges */
+    .feature-card {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 20px 24px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .feature-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.05);
+    }
+
+    .feature-card h3 {
+      font-size: 1.15rem;
+      color: #1e293b;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .feature-card p, .feature-card li {
+      font-size: 0.95rem;
+      color: #475569;
+      line-height: 1.6;
+    }
+
+    .alert-box {
+      border-radius: 14px;
+      padding: 16px 20px;
+      font-size: 0.95rem;
+      display: block;
+      line-height: 1.6;
+      margin: 10px 0;
+    }
+    .alert-danger {
+      background: #fef2f2;
+      border-left: 5px solid #ef4444;
+      color: #991b1b;
+    }
+    .alert-success {
+      background: #f0fdf4;
+      border-left: 5px solid #10b981;
+      color: #166534;
+    }
+    .alert-warning {
+      background: #fffbeb;
+      border-left: 5px solid #f59e0b;
+      color: #92400e;
+    }
+
+    /* Comparison Cards */
+    .compare-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    .compare-card {
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+    }
+    .compare-ng {
+      background: #fef2f2;
+      border: 1.5px solid #fecaca;
+    }
+    .compare-ok {
+      background: #f0fdf4;
+      border: 1.5px solid #bbf7d0;
+    }
+
+    .pill-ng {
+      background: #ef4444;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+    .pill-ok {
+      background: #10b981;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    /* Image Display */
+    .img-showcase {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .sticker-img {
+      max-height: 220px;
+      max-width: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.1));
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .sticker-img:hover {
+      transform: scale(1.06) rotate(1deg);
+    }
+
+    .hero-img {
+      max-height: 280px;
+    }
+
+    .sticker-icon {
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+      vertical-align: middle;
+    }
+
+    /* Lists */
+    ul.styled-list {
+      list-style: none;
+      padding-left: 0;
+    }
+    ul.styled-list li {
+      position: relative;
+      padding-left: 24px;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #334155;
+    }
+    ul.styled-list li::before {
+      content: "•";
+      color: var(--primary);
+      font-size: 1.6rem;
+      position: absolute;
+      left: 6px;
+      top: -6px;
+    }
+
+    /* Data Table */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+    .data-table th, .data-table td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .data-table th {
+      background: #f8fafc;
+      font-weight: 700;
+      color: #334155;
+    }
+    .data-table tr:hover {
+      background: #f1f5f9;
+    }
+
+    /* Footer & Controls */
+    #deck-footer {
+      height: 60px;
+      background: #ffffff;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 32px;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 90;
+    }
+
+    .nav-btn {
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 8px 18px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .nav-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+    .nav-btn.primary {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary-dark);
+    }
+    .nav-btn.primary:hover {
+      background: var(--primary-dark);
+    }
+
+    #slide-indicator {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .key-hint {
+      font-size: 0.75rem;
+      color: #94a3b8;
+      background: #f8fafc;
+      padding: 4px 8px;
+      border-radius: 4px;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Responsive */
+    @media (max-width: 860px) {
+      .grid-2, .compare-container {
+        grid-template-columns: 1fr;
+      }
+      .slide {
+        padding: 24px 20px;
+      }
+      .slide-title {
+        font-size: 1.4rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Progress Bar -->
+  <div id="progress-container">
+    <div id="progress-bar"></div>
+  </div>
+
+  <!-- Deck Slides Container -->
+  <div id="deck-container">
+
+    <!-- Slide 1: 封面 -->
+    <div class="slide active" data-index="1">
+      <div class="slide-header">
+        <span class="slide-tag">✨ 知識庫特刊</span>
+        <span class="source-badge">基於 LLM Wiki 實證文獻編譯</span>
+      </div>
+      <div class="slide-body grid-2">
+        <div>
+          <h1 style="font-size: 2.5rem; font-weight: 900; line-height: 1.25; color: #0f172a; margin-bottom: 16px;">
+            台灣外食族<br><span style="color: var(--primary);">早餐營養學</span> 與 <span style="color: var(--accent);">熱量控制</span> 全攻略
+          </h1>
+          <p style="font-size: 1.15rem; color: #475569; margin-bottom: 24px; line-height: 1.6;">
+            打破「亂吃傷身」的惡性循環！整合初日診所、秀傳醫學、家醫門診與衛福部國健署之實務指引。
+          </p>
+          <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+            <span class="slide-tag">🍳 避開隱形地雷</span>
+            <span class="slide-tag">🥤 戒除奶精液態糖</span>
+            <span class="slide-tag">🥗 211 餐盤實踐</span>
+          </div>
+        </div>
+        <div class="img-showcase">
+          <img src="../../assets/images/A%20balanced%20meal.png" class="sticker-img hero-img" alt="均衡早餐餐盤">
+          <p style="font-size: 0.85rem; color: var(--text-muted); font-style: italic;">外食不是藉口，聰明搭配吃出高代謝</p>
+        </div>
+      </div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+        👉 按鍵盤 <b>[方向鍵 ➔]</b> 或 <b>[空白鍵]</b> 進入下一頁
+      </div>
+    </div>
+
+    <!-- Slide 2: 現況痛點 -->
+    <div class="slide" data-index="2">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">⚠️ 警訊發布</span>
+          <h2 class="slide-title">「亂吃早餐，比不吃更傷身！」</h2>
+        </div>
+        <span class="source-badge">來源：鄧雯心醫師 / 許哲源醫師</span>
+      </div>
+      <div class="slide-body grid-2">
+        <div>
+          <div class="alert-box alert-danger">
+            <b>致命盲點：</b>「只要有吃早餐就有精神？」——錯！高精緻糖油的組合，是早晨昏睡與脂肪堆積的元兇。
+          </div>
+          <ul class="styled-list">
+            <li><b>晨間昏睡 (Food Coma)</b>：精緻高醣引爆血糖與胰島素暴衝，2 小時內發生「反應性低血糖」，造成上午注意力渙散、狂打哈欠。</li>
+            <li><b>脂肪分解鎖死</b>：高濃度胰島素會直接抑制脂肪水解酶，讓體內脂肪一整天無法被當作燃料。</li>
+            <li><b>隱形熱量爆卡</b>：鐵板麵 (600 kcal)＋奶茶 (400 kcal) 單餐就吃下 <b>1000 大卡</b>，幾乎吃掉上班族一整天 60% 的熱量額度！</li>
+          </ul>
+        </div>
+        <div class="img-showcase">
+          <img src="../../assets/images/The%20boy%20eating%20a%20hamburger.png" class="sticker-img" alt="吃漢堡的男孩">
+          <p style="font-size: 0.85rem; color: #ef4444; font-weight: 700;">爆卡、嗜睡、還吃不飽！</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 3: 生理機制 - 血糖與胰島素 -->
+    <div class="slide" data-index="3">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">🧬 生理機制</span>
+          <h2 class="slide-title">晨間血糖風暴與「磨粉爆醣」陷阱</h2>
+        </div>
+        <span class="source-badge">文獻：[[磨粉澱粉與液態糖吸收動力學]]</span>
+      </div>
+      <div class="slide-body grid-2">
+        <div>
+          <div class="feature-card" style="margin-bottom: 16px;">
+            <h3><img src="../../assets/images/Carbohydrate.jpg" class="sticker-icon"> 研磨破壁效應 (Milling Effect)</h3>
+            <p>五穀粉、燕麥飲看似健康養生，但顆粒機械研磨粉碎後，<b>表面積幾何級倍增</b>，水與澱粉酶急速滲透水解，吸收動力學與精緻糖無異，形成晨間爆醣地雷！</p>
+          </div>
+          <div class="feature-card">
+            <h3><img src="../../assets/images/Sugar%20cubes.png" class="sticker-icon"> 胰島素阻抗惡性循環</h3>
+            <p>白吐司、果醬厚片造成胰臟強力分泌胰島素；若缺乏蛋白質與纖維阻擋，血糖驟升驟降將刺激飢餓素 (Ghrelin) 報復性反彈，中午食慾徹底失控。</p>
+          </div>
+        </div>
+        <div class="img-showcase">
+          <img src="../../assets/images/pan_toast_jam.png" class="sticker-img" alt="果醬吐司">
+          <div class="alert-box alert-warning" style="width: 100%;">
+            <b>破解之道：</b>改吃需要咀嚼的「原片大燕麥」或「未精製地瓜」，拒絕沖泡粉！
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 4: 飲料陷阱 - 果糖與DNL -->
+    <div class="slide" data-index="4">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">🥤 飲品殺手</span>
+          <h2 class="slide-title">手搖飲與純果汁：直通肝臟的「脂質新生」</h2>
+        </div>
+        <span class="source-badge">文獻：[[市售含糖飲料含糖量及健康影響-秀傳醫學雜誌]]</span>
+      </div>
+      <div class="slide-body grid-2">
+        <div>
+          <ul class="styled-list">
+            <li><b>空卡食物 (Empty Food)</b>：含糖飲料（SSBs）僅提供熱量，生理上<b>完全不具飽足感</b>，下餐熱量毫無補償。</li>
+            <li><b>脂質新生 (DNL)</b>：高果糖玉米糖漿（HFCS）不需經 PFK 酵素調節，直衝肝臟轉化為三酸甘油酯，<b>每週飲用 7 次含糖飲料，高血壓風險提升 33%、肝病風險高出 56%</b>！</li>
+            <li><b>ATP 耗竭與痛風</b>：果糖代謝大量耗盡 ATP 轉為 AMP，催化尿酸生成。</li>
+          </ul>
+          <div class="alert-box alert-danger">
+            <b>100% 果汁陷阱：</b>葡萄汁每 100ml 含糖高達 <b>13.1g</b>，無纖維阻隔，甚至比汽水更容易促成脂肪肝！
+          </div>
+        </div>
+        <div class="img-showcase">
+          <img src="../../assets/images/bubble%20tea.png" class="sticker-img" alt="珍珠奶茶">
+          <p style="font-size: 0.85rem; color: #dc2626; font-weight: 700;">大杯珍奶含糖 61.6g（超過整天上限！）</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5: 早餐店吸油真相 -->
+    <div class="slide" data-index="5">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">🍳 烹調陷阱</span>
+          <h2 class="slide-title">高溫鐵板與深炸槽：多孔澱粉的「吸油炸彈」</h2>
+        </div>
+        <span class="source-badge">文獻：[[高溫油脂吸附與煎台熱量炸彈]]</span>
+      </div>
+      <div class="slide-body grid-2">
+        <div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>高危品項</th>
+                <th>熱量</th>
+                <th>隱藏陷阱剖析</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>鐵板麵</b></td>
+                <td><span class="pill-ng">500~600 kcal</span></td>
+                <td>玉米勾芡醬汁極度親脂，緊緊裹住鐵板油脂與精緻油麵。</td>
+              </tr>
+              <tr>
+                <td><b>燒餅油條</b></td>
+                <td><span class="pill-ng">400~500 kcal</span></td>
+                <td>燒餅包酥油，油條是多孔油炸麵糰，「純粹在吃油」。</td>
+              </tr>
+              <tr>
+                <td><b>蘿蔔糕 (2片)</b></td>
+                <td><span class="pill-ng">250~350 kcal</span></td>
+                <td>米漿多孔性結構，煎台高溫吸油率達 20% 以上！</td>
+              </tr>
+              <tr>
+                <td><b>奶精奶茶</b></td>
+                <td><span class="pill-ng">300~400 kcal</span></td>
+                <td>氫化植物油＋玉米糖漿，充滿飽和脂肪與反式脂肪。</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="img-showcase">
+          <img src="../../assets/images/Fried%20food.png" class="sticker-img" alt="油炸食物地雷">
+          <p style="font-size: 0.85rem; color: var(--text-muted);">煎台反覆高溫催化氧化脂肪與發炎物質</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 6: 官方標準 -->
+    <div class="slide" data-index="6">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">🏛️ 官方權威</span>
+          <h2 class="slide-title">衛福部《每日飲食指南》三大營養素黃金配比</h2>
+        </div>
+        <span class="source-badge">文獻：[[每日飲食指南手冊-國健署]]</span>
+      </div>
+      <div class="slide-body grid-3">
+        <div class="feature-card" style="border-top: 4px solid #3b82f6;">
+          <h3><img src="../../assets/images/Protein.jpg" class="sticker-icon"> 蛋白質 (10~20%)</h3>
+          <p>建造修補組織、穩定晨間食慾。官方排序：<b>豆 ➔ 魚 ➔ 蛋 ➔ 肉</b>。提倡植物性黃豆蛋白為首選，避免過多動物性飽和脂肪。</p>
+        </div>
+        <div class="feature-card" style="border-top: 4px solid #f59e0b;">
+          <h3><img src="../../assets/images/Lipids.jpg" class="sticker-icon"> 脂質 (20~30%)</h3>
+          <p>維持神經與荷爾蒙恆定。以<b>天然不飽和堅果種子</b>取代精煉烹調油與人造抹醬，全脂乳品已被證實不增加心血管負擔。</p>
+        </div>
+        <div class="feature-card" style="border-top: 4px solid #10b981;">
+          <h3><img src="../../assets/images/Carbohydrate.jpg" class="sticker-icon"> 醣類 (50~60%)</h3>
+          <p>人體主要動能來源。<b>強制要求至少 1/3 為未精製全穀雜糧</b>（糙米、地瓜、燕麥、南瓜），徹底告別精緻白澱粉！</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7: 國健署餐盤與拳掌法則 -->
+    <div class="slide" data-index="7">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">🖐️ 隨身量尺</span>
+          <h2 class="slide-title">國健署「我的餐盤」六口訣與拳掌速算法</h2>
+        </div>
+        <span class="source-badge">文獻：[[國健署六口訣外食速算拳掌法]]</span>
+      </div>
+      <div class="slide-body grid-2">
+        <div>
+          <ul class="styled-list">
+            <li>🥛 <b>每天早晚一杯奶</b>：鮮奶或無糖優酪乳 240ml，補充國人最缺乏的鈣質。</li>
+            <li>🍎 <b>每餐水果拳頭大</b>：切塊大半碗，堅持吃原型，不喝果汁。</li>
+            <li>🥦 <b>菜比水果多一點</b>：每餐約 1.5 個拳頭，<b>1/3 必須選深綠色蔬菜</b>。</li>
+            <li>🍚 <b>飯跟蔬菜一樣多</b>：地瓜、全麥吐司份量與蔬菜相當，以未精製為主。</li>
+            <li>🥩 <b>豆魚蛋肉一掌心</b>：手掌心大小及厚度（約茶葉蛋 1~2 顆＋無糖豆漿）。</li>
+            <li>🥜 <b>堅果種子一茶匙</b>：大拇指第一節大小（核桃 1 粒或杏仁 2 粒）。</li>
+          </ul>
+        </div>
+        <div class="img-showcase">
+          <img src="../../assets/images/A%20balanced%20meal.png" class="sticker-img" alt="餐盤六口訣">
+          <div class="alert-box alert-success" style="width: 100%;">
+            <b>3秒速算：</b>在外不用電子秤，雙手就是最精準的飲食量規！
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 8: 211 餐盤與進食順序 -->
+    <div class="slide" data-index="8">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">⚡ 減脂黃金法則</span>
+          <h2 class="slide-title">外食族「211 餐盤」與「水肉菜飯果」順序</h2>
+        </div>
+        <span class="source-badge">文獻：[[外食族211晨間餐盤實踐法]]、[[水肉菜飯果進食順序法]]</span>
+      </div>
+      <div class="slide-body">
+        <div class="compare-container" style="margin-bottom: 12px;">
+          <div class="compare-card compare-ng">
+            <span class="pill-ng">避開「混、包、夾」食物</span>
+            <p style="margin-top: 10px; font-size: 0.95rem; color: #7f1d1d;">
+              肉羹麵、小籠包、糯米飯糰、總匯三明治將澱粉與高溫油緊密包裹，每一口都催化高升糖，徹底瓦解進食順序！
+            </p>
+          </div>
+          <div class="compare-card compare-ok">
+            <span class="pill-ok">水 ➔ 肉 ➔ 菜 ➔ 飯 ➔ 果</span>
+            <p style="margin-top: 10px; font-size: 0.95rem; color: #14532d;">
+              1. 溫水喚醒腸道 ➔ 2. 蛋白質觸發 GLP-1 飽足荷爾蒙 ➔ 3. 纖維建置黏稠阻隔網 ➔ 4. 最後吃澱粉與低 GI 水果。
+            </p>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: space-around; align-items: center; background: #f8fafc; padding: 12px; border-radius: 14px;">
+          <div style="text-align: center;"><img src="../../assets/images/petbottle_water_full.png" style="height: 50px;"><br><small>1. 喝水</small></div>
+          <div>➔</div>
+          <div style="text-align: center;"><img src="../../assets/images/Meat_Chicken%20Leg.png" style="height: 50px;"><br><small>2. 優質蛋白</small></div>
+          <div>➔</div>
+          <div style="text-align: center;"><img src="../../assets/images/Vegetable.png" style="height: 50px;"><br><small>3. 蔬菜纖維</small></div>
+          <div>➔</div>
+          <div style="text-align: center;"><img src="../../assets/images/A%20bowl%20of%20white%20rice.png" style="height: 50px;"><br><small>4. 未精製澱粉</small></div>
+          <div>➔</div>
+          <div style="text-align: center;"><img src="../../assets/images/The%20boy%20eating%20an%20apple.png" style="height: 50px;"><br><small>5. 拳頭水果</small></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 9: 實戰改造 - 6大典型地雷對照 -->
+    <div class="slide" data-index="9">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">🛠️ 實戰改造</span>
+          <h2 class="slide-title">常見外食早餐 6 大 NG 組合大翻身</h2>
+        </div>
+        <span class="source-badge">文獻：[[常見外食早餐地雷改造SOP]]</span>
+      </div>
+      <div class="slide-body">
+        <table class="data-table" style="font-size: 0.85rem;">
+          <thead>
+            <tr>
+              <th>典型 NG 組合 (地雷點)</th>
+              <th>❌ NG 配比</th>
+              <th>推薦 OK 改造組合</th>
+              <th>✅ 改造後配比</th>
+              <th>關鍵改造亮點</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><b>雞蛋沙拉吐司＋拿鐵</b></td>
+              <td>脂42% / 蛋17% / 醣41%</td>
+              <td><b>茶葉蛋＋和風沙拉＋無糖豆漿</b></td>
+              <td>脂50% / 蛋36% / 醣14%</td>
+              <td>原型食物，拔除美乃滋與乳糖，蛋白質翻倍。</td>
+            </tr>
+            <tr>
+              <td><b>饅頭＋芝麻醬＋沖泡五穀粉</b></td>
+              <td>脂16% / 蛋10% / 醣74%</td>
+              <td><b>原片燕麥＋起司＋五穀粉半匙＋豆漿</b></td>
+              <td>脂43% / 蛋19% / 醣38%</td>
+              <td>粉類減半，加入原片燕麥與起司阻斷水解。</td>
+            </tr>
+            <tr>
+              <td><b>吐司2片＋二合一咖啡</b></td>
+              <td>脂6% / 蛋11% / 醣83%</td>
+              <td><b>堅果5顆＋無糖優格＋黑咖啡</b></td>
+              <td>脂58% / 蛋17% / 醣25%</td>
+              <td>大幅減醣，導入發酵乳酸菌與健康好油。</td>
+            </tr>
+            <tr>
+              <td><b>地瓜＋水果＋綠拿鐵</b></td>
+              <td>脂0% / 蛋5% / 醣94%</td>
+              <td><b>地瓜35g＋水煮蛋2顆＋綠拿鐵</b></td>
+              <td>脂35% / 蛋26% / 醣39%</td>
+              <td>綠拿鐵菜果比 3:1，補足水煮蛋平衡爆醣。</td>
+            </tr>
+            <tr>
+              <td><b>培根蛋餅＋全糖奶茶</b></td>
+              <td>脂43% / 蛋9% / 醣48%</td>
+              <td><b>鮪魚蛋餅 (加生菜)＋無糖鮮奶茶</b></td>
+              <td>脂43% / 蛋19% / 醣38%</td>
+              <td>培根換鮪魚白肉，奶精換鮮奶並去糖。</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Slide 10: 場景攻防 - 中式與超商指南 -->
+    <div class="slide" data-index="10">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">🏪 場景攻防</span>
+          <h2 class="slide-title">超商 7-11/全家 vs. 傳統中式豆漿店點餐</h2>
+        </div>
+        <span class="source-badge">文獻：[[中式早餐低油避坑與點餐指南]]</span>
+      </div>
+      <div class="slide-body grid-2">
+        <div class="feature-card">
+          <h3 style="color: #059669;"><img src="../../assets/images/food_sandwich_blt.png" class="sticker-icon"> 便利商店 500 kcal 黃金盤</h3>
+          <ul class="styled-list">
+            <li><b>優質蛋白 (20g+)</b>：茶葉蛋 1~2 顆 ＋ 統一陽光無糖高纖豆漿 (0.6g糖/100ml)。</li>
+            <li><b>原型澱粉</b>：現烤地瓜半條 (約 80g，拳頭大)。</li>
+            <li><b>豐富纖維</b>：日式和風蔬菜沙拉盒（醬汁僅沾取 1/3）。</li>
+          </ul>
+        </div>
+        <div class="feature-card">
+          <h3 style="color: #d97706;"><img src="../../assets/images/soup_蛋花湯.png" class="sticker-icon"> 傳統豆漿店無油生存法</h3>
+          <ul class="styled-list">
+            <li><b>堅定基底</b>：大杯無糖清漿（含 15g 豐富植物大豆蛋白）。</li>
+            <li><b>蛋白質升級</b>：雙份蔥花蛋（請店家少油少鹽）。</li>
+            <li><b>避坑鐵律</b>：徹底放生油條、米漿與水煎包；若點燒餅，改夾蔥蛋生菜。</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 11: 飲料降階減糖法 -->
+    <div class="slide" data-index="11">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">☕ 飲品革命</span>
+          <h2 class="slide-title">四階段無痛「降階減糖」SOP</h2>
+        </div>
+        <span class="source-badge">文獻：[[外食早餐飲品降階減糖法]]</span>
+      </div>
+      <div class="slide-body grid-2">
+        <div>
+          <div class="feature-card" style="margin-bottom: 12px; border-left: 5px solid #ef4444;">
+            <b>階段 1：剔除奶精反式脂肪</b> ➔ 奶精奶茶改為「鮮奶茶半糖」（熱量現砍 50%）。
+          </div>
+          <div class="feature-card" style="margin-bottom: 12px; border-left: 5px solid #f59e0b;">
+            <b>階段 2：甜度折半阻斷 DNL</b> ➔ 切換至「鮮奶茶微糖」或「低糖高纖豆漿」。
+          </div>
+          <div class="feature-card" style="margin-bottom: 12px; border-left: 5px solid #3b82f6;">
+            <b>階段 3：切換為原型無糖蛋白</b> ➔ 「無糖鮮奶茶」或「無糖黑豆漿」。
+          </div>
+          <div class="feature-card" style="border-left: 5px solid #10b981;">
+            <b>終極階段：代謝自由</b> ➔ 「無糖高纖豆漿 (15g蛋白)」或「美式黑咖啡 (0卡提高代謝)」。
+          </div>
+        </div>
+        <div class="img-showcase">
+          <img src="../../assets/images/coffee.png" class="sticker-img" alt="黑咖啡">
+          <p style="font-size: 0.85rem; color: #059669; font-weight: 700;">黑咖啡＋無糖豆漿＝晨間燃脂神隊友</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 12: 總結與行動清單 -->
+    <div class="slide" data-index="12">
+      <div class="slide-header">
+        <div>
+          <span class="slide-tag">🎯 行動宣言</span>
+          <h2 class="slide-title">外食早餐 10 秒檢核清單與生活實踐</h2>
+        </div>
+        <span class="source-badge">LLM Wiki 知識庫總結</span>
+      </div>
+      <div class="slide-body grid-2">
+        <div>
+          <h3 style="margin-bottom: 14px; color: #1e293b;">明天走進早餐店，默念三件事：</h3>
+          <div class="alert-box alert-success" style="margin-bottom: 14px;">
+            <b>1. 看掌心：</b>我的蛋白質有掌心大嗎？（蛋、豆漿、里肌、鮪魚）
+          </div>
+          <div class="alert-box alert-warning" style="margin-bottom: 14px;">
+            <b>2. 看拳頭：</b>我的澱粉有沒有超標？（拒絕鐵板麵，選地瓜或全麥）
+          </div>
+          <div class="alert-box alert-danger">
+            <b>3. 去醬去糖：</b>明確向老闆說「不抹沙拉醬、不加甜醬油、飲料選無糖」！
+          </div>
+        </div>
+        <div class="img-showcase">
+          <img src="../../assets/images/animal_quiz_true.png" class="sticker-img" alt="健康生活正解">
+          <div style="text-align: center; margin-top: 10px;">
+            <span class="pill-ok" style="font-size: 1rem; padding: 6px 16px;">健康不是少吃，而是聰明選擇！</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Deck Footer Controls -->
+  <div id="deck-footer">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <button class="nav-btn" id="prev-btn">◀ 上一頁</button>
+      <button class="nav-btn primary" id="next-btn">下一頁 ▶</button>
+      <span class="key-hint">鍵盤 ◀ / ▶ 鍵</span>
+    </div>
+
+    <div id="slide-indicator">Slide 1 / 12</div>
+
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <button class="nav-btn" id="fs-btn">全螢幕切換 ⛶</button>
+    </div>
+  </div>
+
+  <!-- Navigation JavaScript -->
+  <script>
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+    let currentSlide = 1;
+
+    const progressBar = document.getElementById('progress-bar');
+    const slideIndicator = document.getElementById('slide-indicator');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const fsBtn = document.getElementById('fs-btn');
+
+    function updateSlide(newIndex) {
+      if (newIndex < 1) newIndex = 1;
+      if (newIndex > totalSlides) newIndex = totalSlides;
+
+      currentSlide = newIndex;
+
+      slides.forEach((slide, idx) => {
+        if (idx + 1 === currentSlide) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+
+      // Update progress bar
+      const progressPercent = ((currentSlide - 1) / (totalSlides - 1)) * 100;
+      progressBar.style.width = progressPercent + '%';
+
+      // Update indicator
+      slideIndicator.textContent = `Slide ${currentSlide} / ${totalSlides}`;
+
+      // Button states
+      prevBtn.disabled = (currentSlide === 1);
+      nextBtn.disabled = (currentSlide === totalSlides);
+      prevBtn.style.opacity = (currentSlide === 1) ? '0.5' : '1';
+      nextBtn.style.opacity = (currentSlide === totalSlides) ? '0.5' : '1';
+    }
+
+    // Event Listeners
+    prevBtn.addEventListener('click', () => updateSlide(currentSlide - 1));
+    nextBtn.addEventListener('click', () => updateSlide(currentSlide + 1));
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        updateSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        updateSlide(currentSlide - 1);
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        updateSlide(1);
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        updateSlide(totalSlides);
+      } else if (e.key === 'f' || e.key === 'F') {
+        toggleFullScreen();
+      }
+    });
+
+    function toggleFullScreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(err => console.log(err));
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      }
+    }
+
+    fsBtn.addEventListener('click', toggleFullScreen);
+
+    // Initialize
+    updateSlide(1);
+  </script>
+</body>
+</html>
